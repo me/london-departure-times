@@ -76,17 +76,61 @@
 
 	if ((0, _jquery2.default)('body').is('#stops-page')) {
 	  (function () {
-	    var $notice = (0, _jquery2.default)(".notice").text("Please wait, finding your location...");
-	    var geoLocalize = _baconjs2.default.fromCallback(navigator.geolocation, 'getCurrentPosition');
-
-	    geoLocalize.onError(function (e) {
-	      $notice.text("We are sorry, we were not able to localize you. You can search in the box on the left, or try some sample location below!");
-	      (0, _jquery2.default)('.sample-locations').show();
-	    });
-
+	    var $notice = (0, _jquery2.default)(".notice");
 	    var position = _baconjs2.default.Model.combine({
 	      lat: _baconjs2.default.$.textFieldValue((0, _jquery2.default)('#lat')),
 	      lon: _baconjs2.default.$.textFieldValue((0, _jquery2.default)('#lon'))
+	    });
+	    var map = new _google2.default.maps.Map(document.getElementById('map-container'), {
+	      zoom: 16, minZoom: 15,
+	      disableDoubleClickZoom: false
+	    });
+	    var geocoder = new _google2.default.maps.Geocoder();
+
+	    var positionStream = position.toEventStream().filter(function (it) {
+	      return it.lat !== "" && it.lon !== "";
+	    }).map(function (it) {
+	      return { lat: parseFloat(it.lat).toFixed(5), lon: parseFloat(it.lon).toFixed(5) };
+	    }).skipDuplicates(function (v1, v2) {
+	      return v1.lat == v2.lat && v1.lon == v2.lon;
+	    }).throttle(100);
+
+	    var stopsRequest = positionStream.map(function (it) {
+	      return { url: '/api/stops',
+	        data: { lat: it.lat, lon: it.lon }
+	      };
+	    }).ajax();
+	    var markers = [];
+	    if (position.get().lat === "" && position.get().lon === "") {
+	      $notice.text("Please wait, finding your location...");
+	      var geoLocalize = _baconjs2.default.fromCallback(navigator.geolocation, 'getCurrentPosition');
+	      geoLocalize.onValue(function (it) {
+	        position.set({ lat: it.coords.latitude, lon: it.coords.longitude });
+	      });
+	      geoLocalize.onError(function (e) {
+	        $notice.text("We are sorry, we were not able to localize you. You can search in the box on the left, or try some sample location below!");
+	        (0, _jquery2.default)('.sample-locations').show();
+	      });
+	    }
+
+	    (0, _jquery2.default)('body').on('click', 'a[data-latlon]', function (e) {
+	      var latlon = (0, _jquery2.default)(e.target).data('latlon').split(",").map(function (v) {
+	        return parseFloat(v);
+	      });
+	      position.set({ lat: latlon[0], lon: latlon[1] });
+	    });
+
+	    (0, _jquery2.default)('#address-form').submitE().onValue(function (e) {
+	      e.preventDefault();
+	      var address = addressField.get();
+	      if (address === "") {
+	        return;
+	      }
+	      geocoder.geocode({ address: addressField.get() }, function (result, status) {
+	        if (status == _google2.default.maps.GeocoderStatus.OK) {
+	          map.setCenter(result[0].geometry.location);
+	        }
+	      });
 	    });
 
 	    var addressField = _baconjs2.default.$.textFieldValue((0, _jquery2.default)('#address'));
@@ -94,34 +138,15 @@
 	      addressField.set("");
 	    });
 
-	    geoLocalize.onValue(function (it) {
-	      position.set({ lat: it.coords.latitude, lon: it.coords.longitude });
-	    });
-
-	    var map = new _google2.default.maps.Map(document.getElementById('map-container'), {
-	      zoom: 16, minZoom: 15,
-	      disableDoubleClickZoom: false
-	    });
-
 	    map.addListener('bounds_changed', function () {
 	      var center = map.getCenter();
 	      position.set({ lat: center.lat(), lon: center.lng() });
 	    });
 
-	    var geocoder = new _google2.default.maps.Geocoder();
-
-	    var positionStream = position.changes().throttle(1000).filter(function (it) {
-	      return it.lat !== "" && it.lon !== "";
-	    });
-
-	    var geoRequest = positionStream.map(function (it) {
-	      return { url: '/api/stops',
-	        data: { lat: it.lat, lon: it.lon }
-	      };
-	    }).ajax();
-
 	    positionStream.onValue(function (it) {
 	      (0, _jquery2.default)(".notice").text("Please wait, loading results...");
+	      (0, _jquery2.default)('.results').empty();
+	      history.replaceState({}, "", '?lat=' + it.lat + '&lon=' + it.lon);
 	      var latlng = new _google2.default.maps.LatLng(it.lat, it.lon);
 	      map.setCenter(latlng);
 	      geocoder.geocode({ 'location': latlng }, function (results, status) {
@@ -133,9 +158,7 @@
 	      });
 	    });
 
-	    var markers = [];
-
-	    geoRequest.onValue(function (v) {
+	    stopsRequest.onValue(function (v) {
 	      (0, _jquery2.default)(".notice").text("");
 	      var _iteratorNormalCompletion = true;
 	      var _didIteratorError = false;
@@ -162,20 +185,39 @@
 	        }
 	      }
 
+	      (0, _jquery2.default)('.results').empty();
 	      var _iteratorNormalCompletion2 = true;
 	      var _didIteratorError2 = false;
 	      var _iteratorError2 = undefined;
 
 	      try {
-	        for (var _iterator2 = v[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	        var _loop = function _loop() {
 	          var stop = _step2.value;
 
+	          var stopName = stop.name + ' - ' + stop.indicator;
+	          var stopTarget = '/' + stop.provider + '/' + stop.id;
 	          var marker = new _google2.default.maps.Marker({
 	            position: new _google2.default.maps.LatLng(stop.lat, stop.lon),
 	            map: map,
-	            title: stop.name + ' - ' + stop.indicator
+	            title: stopName
+	          });
+	          marker.addListener('click', function (e) {
+	            document.location.href = stopName;
 	          });
 	          markers.push(marker);
+	          var lines = stop.lines.map(function (v) {
+	            return v.name;
+	          }).join(", ");
+	          (0, _jquery2.default)('.results').append((0, _jquery2.default)('<li/>').append((0, _jquery2.default)("<a/>").text(stopName).attr("href", stopTarget)).append((0, _jquery2.default)('<span/>').text('Lines: ' + lines)).mouseenter(function (e) {
+	            marker.setAnimation(_google2.default.maps.Animation.BOUNCE);
+	            setTimeout(function () {
+	              return marker.setAnimation(null);
+	            }, 600);
+	          }));
+	        };
+
+	        for (var _iterator2 = v[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+	          _loop();
 	        }
 	      } catch (err) {
 	        _didIteratorError2 = true;
@@ -191,19 +233,6 @@
 	          }
 	        }
 	      }
-	    });
-
-	    (0, _jquery2.default)('#address-form').submitE().onValue(function (e) {
-	      e.preventDefault();
-	      var address = addressField.get();
-	      if (address === "") {
-	        return;
-	      }
-	      geocoder.geocode({ address: addressField.get() }, function (result, status) {
-	        if (status == _google2.default.maps.GeocoderStatus.OK) {
-	          map.setCenter(result[0].geometry.location);
-	        }
-	      });
 	    });
 	  })();
 	}
