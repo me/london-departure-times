@@ -1,8 +1,8 @@
 package main
 
-type StopsService interface {
-	Get(lat float32, lon float32, radius uint) ([]Stop, error)
-}
+import (
+	"time"
+)
 
 type Stop struct {
 	Id        string `json:"id"`
@@ -14,4 +14,23 @@ type Stop struct {
 type Line struct {
 	Id   string `json:"id"`
 	Name string `json:"name"`
+}
+
+type Vehicle struct {
+	Id          string `json:"id"`
+	Type        string `json:"type"`
+	Destination string `json:"destination"`
+}
+
+type Arrival struct {
+	Vehicle  Vehicle   `json:"vehicle"`
+	Expected time.Time `json:"expected"`
+}
+
+type StopsService interface {
+	Get(lat float32, lon float32, radius uint) ([]Stop, error)
+}
+
+type ArrivalsService interface {
+	Get(stopId string) ([]Arrival, error)
 }
