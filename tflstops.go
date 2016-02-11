@@ -29,13 +29,15 @@ type TFLIdentifier struct {
 }
 
 // GET /StopPoint
-func (api *TFLStopsServiceOp) Get(lat float32, lon float32, radius uint) ([]Stop, error) {
+func (api *TFLStopsServiceOp) Get(lat float64, lon float64, radius uint) ([]Stop, error) {
 	u := api.client.BaseURL
 	u.Path = "/StopPoint"
 	query := u.Query()
 	query.Set("lat", fmt.Sprintf("%.2f", lat))
 	query.Set("lon", fmt.Sprintf("%.2f", lon))
 	query.Set("radius", fmt.Sprintf("%d", radius))
+	query.Set("stopTypes", tflStopTypes)
+	u.RawQuery = query.Encode()
 
 	stopPointsResponse := new(TFLStopPointsResponse)
 	_, err := api.client.Request(*u, stopPointsResponse)

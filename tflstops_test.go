@@ -11,7 +11,7 @@ func TestTFLStops_Get(t *testing.T) {
 	setupTFL()
 	defer teardownTFL()
 
-	mux.HandleFunc("/StopPoint", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/StopPoints", func(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Fprint(w, `{
       "$type": "Tfl.Api.Presentation.Entities.StopPointsResponse, Tfl.Api.Presentation.Entities",

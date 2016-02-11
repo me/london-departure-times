@@ -28,7 +28,7 @@ type Arrival struct {
 }
 
 type StopsService interface {
-	Get(lat float32, lon float32, radius uint) ([]Stop, error)
+	Get(lat float64, lon float64, radius uint) ([]Stop, error)
 }
 
 type ArrivalsService interface {

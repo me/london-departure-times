@@ -1,3 +1,5 @@
 .env
 vendor
 gin-bin
+node_modules
+npm-debug.log

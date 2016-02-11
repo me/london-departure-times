@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 )
@@ -28,14 +29,14 @@ type TFLClient struct {
 }
 
 // NewClient returns a new DigitalOcean API client.
-func NewTFLClient(httpClient *http.Client) *TFLClient {
+func NewTFLClient(httpClient *http.Client, appId string, appKey string) *TFLClient {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
 
 	baseURL, _ := url.Parse(tflDefaultBaseURL)
 
-	c := &TFLClient{client: httpClient, BaseURL: baseURL}
+	c := &TFLClient{client: httpClient, BaseURL: baseURL, appId: appId, appKey: appKey}
 
 	c.Stops = &TFLStopsServiceOp{client: c}
 	c.Arrivals = &TFLArrivalsServiceOp{client: c}
@@ -47,8 +48,9 @@ func (client *TFLClient) Request(url url.URL, v interface{}) (*http.Response, er
 	query := url.Query()
 	query.Set("app_id", client.appId)
 	query.Set("app_key", client.appKey)
+	url.RawQuery = query.Encode()
 
-	resp, err := http.Get(url.String())
+	resp, err := client.client.Get(url.String())
 
 	defer func() {
 		if rerr := resp.Body.Close(); err == nil {
@@ -60,7 +62,7 @@ func (client *TFLClient) Request(url url.URL, v interface{}) (*http.Response, er
 		return resp, err
 	}
 	if resp != nil && resp.StatusCode != 200 {
-		return resp, errors.New("Request not successful")
+		return resp, errors.New(fmt.Sprintf("Request returned %v", resp.StatusCode))
 	}
 
 	if v != nil {

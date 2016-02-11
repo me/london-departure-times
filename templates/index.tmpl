@@ -1,5 +1,17 @@
 <html>
-    <h1>
-        {{ .title }}
-    </h1>
+  <head>
+    <link rel="stylesheet" type="text/css" href="/assets/app.css">
+
+  </head>
+  <body id="stops-page">
+    <form action="/api/stops" method="GET">
+      <div class="input-group">
+        <label for="lat">Latitude:</label>
+        <input type="text" id="lat" name="lat" placeholder="0.00" value="{{ .lat }}">
+        <label for="lat">Longitude</label>
+        <input type="text" id="lon" name="lon" placeholder="0.00" value="{{ .lon }}">
+      </div>
+    </form>
+    <script type="text/javascript" src="/assets/app.js"></script>
+  </body>
 </html>
