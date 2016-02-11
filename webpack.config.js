@@ -26,7 +26,10 @@ module.exports = {
       }
     ]
   },
-   plugins: [
+  plugins: [
       new ExtractTextPlugin("[name].css", {allChunks: true})
-  ]
+  ],
+  externals: {
+    "google": "google"
+  }
 };

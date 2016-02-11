@@ -1,3 +1,33 @@
+@import "bourbon/bourbon";
+@import "base/base";
+
 body {
   background: white;
+}
+
+#latlon-form {
+  display: none;
+}
+
+.sample-locations {
+  display: none;
+}
+
+.wrapper {
+  @include clearfix;
+  margin: 0 20px;
+}
+
+.results-section {
+  float: left;
+}
+
+.map-section {
+  width: 500px;
+  float: right;
+}
+
+#map-container {
+  width: 500px;
+  height: 500px;
 }

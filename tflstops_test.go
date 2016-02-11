@@ -22,6 +22,7 @@ func TestTFLStops_Get(t *testing.T) {
         "id": "490015372W", "commonName": "Marcilly Road",
         "naptanId": "490015372W", "indicator": "Stop SB", "stopLetter": "SB", "modes": ["bus"],
         "icsCode": "1009638", "stopType": "NaptanPublicBusCoachTram", "stationNaptan": "490015372W",
+        "lat": 51.459726, "lon": -0.179222
         "lines": [
           {
             "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
@@ -49,7 +50,8 @@ func TestTFLStops_Get(t *testing.T) {
 	}
 
 	lines := []Line{{Id: "156", Name: "156"}, {Id: "170", Name: "170"}}
-	expected := []Stop{{Id: "490015372W", Indicator: "Stop SB", Name: "Marcilly Road", Lines: lines}}
+	expected := []Stop{{Id: "490015372W", Provider: "tfl", Indicator: "Stop SB", Name: "Marcilly Road",
+		Latitude: 51.459726, Longitude: -0.179222, Lines: lines}}
 	if !reflect.DeepEqual(stops, expected) {
 		t.Errorf("Stops().Get returned %+v, expected %+v", stops, expected)
 	}

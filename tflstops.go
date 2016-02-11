@@ -19,6 +19,8 @@ type TFLStopPoint struct {
 	Id        string          `json:"id"`
 	Indicator string          `json:"indicator"`
 	Name      string          `json:"commonName"`
+	Lat       float64         `json:"lat"`
+	Lon       float64         `json:"lon"`
 	Lines     []TFLIdentifier `json:"lines"`
 }
 
@@ -51,7 +53,8 @@ func (api *TFLStopsServiceOp) Get(lat float64, lon float64, radius uint) ([]Stop
 		for j, tflLine := range tflStopPoint.Lines {
 			lines[j] = Line{tflLine.Id, tflLine.Name}
 		}
-		stops[i] = Stop{tflStopPoint.Id, tflStopPoint.Indicator, tflStopPoint.Name, lines}
+		stops[i] = Stop{tflStopPoint.Id, "tfl", tflStopPoint.Indicator, tflStopPoint.Name,
+			tflStopPoint.Lat, tflStopPoint.Lon, lines}
 	}
 	return stops, nil
 }

@@ -4,14 +4,31 @@
 
   </head>
   <body id="stops-page">
-    <form action="/api/stops" method="GET">
-      <div class="input-group">
-        <label for="lat">Latitude:</label>
-        <input type="text" id="lat" name="lat" placeholder="0.00" value="{{ .lat }}">
-        <label for="lat">Longitude</label>
-        <input type="text" id="lon" name="lon" placeholder="0.00" value="{{ .lon }}">
+    <div class="wrapper">
+       <div class="results-section">
+        <div class="notice"></div>
+        <div class="sample-locations">
+          Loc A
+          Loc B
+        </div>
       </div>
-    </form>
+      <div class="map-section">
+        <form id="latlon-form" action="/api/stops" method="GET">
+          <div class="input-group">
+            <label for="lat">Latitude:</label>
+            <input type="text" id="lat" name="lat" placeholder="0.00" value="{{ .lat }}">
+            <label for="lat">Longitude</label>
+            <input type="text" id="lon" name="lon" placeholder="0.00" value="{{ .lon }}">
+          </div>
+        </form>
+        <form id="address-form" action="">
+          <input type="text" name="address" id="address" placeholder="Search for an address...">
+        </form>
+        <div id="map-container"></div>
+      </div>
+
+    </div>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3"></script>
     <script type="text/javascript" src="/assets/app.js"></script>
   </body>
 </html>

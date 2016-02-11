@@ -5,10 +5,13 @@ import (
 )
 
 type Stop struct {
-	Id        string `json:"id"`
-	Indicator string `json:"indicator"`
-	Name      string `json:"name"`
-	Lines     []Line `json:"lines"`
+	Id        string  `json:"id"`
+	Provider  string  `json:"provider"`
+	Indicator string  `json:"indicator"`
+	Name      string  `json:"name"`
+	Latitude  float64 `json:"lat"`
+	Longitude float64 `json:"lon"`
+	Lines     []Line  `json:"lines"`
 }
 
 type Line struct {
