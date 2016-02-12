@@ -20,8 +20,16 @@ if ($("#page").is(".arrivals-page")) {
       else { return 0; }
     });
     for (let arrival of arrivals) {
-      let expected = moment(arrival.expected).fromNow();
-      let description = `${arrival.line} to ${arrival.vehicle.destination}`;
+      let expected = moment(arrival.expected);
+      if (expected.isBefore(moment().add(1, 'minutes'))) {
+        expected = "due";
+      } else {
+        expected = expected.fromNow();
+      }
+      let description = arrival.line;
+      if (arrival.vehicle.destination !== "") {
+        description += ` to ${arrival.vehicle.destination}`;
+      }
       $results.append(
         $("<li/>").append(
           $("<span />").text(`${description} ${expected}`)

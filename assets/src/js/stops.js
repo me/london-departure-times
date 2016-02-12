@@ -17,7 +17,7 @@ if ($("#page").is('.stops-page')) {
 
   let positionStream = position.toEventStream()
     .filter(it => it.lat !== "" && it.lon !== "")
-    .map(it => ({lat: parseFloat(it.lat).toFixed(5), lon: parseFloat(it.lon).toFixed(5)}))
+    .map(it => ({lat: parseFloat(it.lat).toFixed(4), lon: parseFloat(it.lon).toFixed(4)}))
     .skipDuplicates((v1, v2) => (v1.lat == v2.lat && v1.lon == v2.lon))
     .throttle(1000);
 
@@ -81,21 +81,30 @@ if ($("#page").is('.stops-page')) {
     });
   });
 
+  let showNoResults = () => {
+    $(".notice").text("Sorry, we could not find any stops around here. You could try some of the sample locations below!");
+    $('.sample-locations').show();
+  };
+
   stopsRequest.onValue(v => {
     $(".notice").text("");
     for (let marker of markers) {
       marker.setMap(null);
     }
     $('.results').empty();
+    if (v.stops.length === 0) {
+      showNoResults();
+    }
     for (let stop of v.stops) {
-      let stopName = `${stop.name} - ${stop.indicator}`;
+      let stopName = stop.name;
+      if (stop.indicator !== ""){ stopName += ` - ${stop.indicator}`; }
       let stopTarget = `/${stop.provider}/arrivals/${stop.id}`;
       let marker = new google.maps.Marker({
         position: new google.maps.LatLng(stop.lat, stop.lon),
         map: map,
         title: stopName
       });
-      marker.addListener('click', e => {document.location.href = stopName;});
+      marker.addListener('click', e => {document.location.href = stopTarget;});
       markers.push(marker);
       let lines = stop.lines.map(v => v.name).join(", ");
       $('.results').append(
@@ -112,9 +121,6 @@ if ($("#page").is('.stops-page')) {
     }
   });
 
-  stopsRequest.onError(e => {
-    $(".notice").text("Sorry, we could not find any stops around here. You could try some of the sample locations below!");
-    $('.sample-locations').show();
-  });
+  stopsRequest.onError(showNoResults);
 
 }

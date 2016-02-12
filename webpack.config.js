@@ -1,4 +1,6 @@
+var webpack = require('webpack');
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
+
 
 module.exports = {
   entry: {
@@ -27,7 +29,8 @@ module.exports = {
     ]
   },
   plugins: [
-      new ExtractTextPlugin("[name].css", {allChunks: true})
+      new ExtractTextPlugin("[name].css", {allChunks: true}),
+      new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
   ],
   externals: {
     "google": "google"

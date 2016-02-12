@@ -46,7 +46,7 @@ func main() {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		stops, err := client.Stops.Get(lat, lon, 200)
+		stops, err := client.Stops.Get(lat, lon, 300)
 
 		if err != nil {
 			log.Printf("Error getting stops from API: %v", err)

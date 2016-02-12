@@ -6,12 +6,18 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sort"
 )
 
 const (
 	tflDefaultBaseURL = "https://api.tfl.gov.uk/"
 	tflMediaType      = "application/json"
-	tflStopTypes      = "NaptanPublicBusCoachTram,NaptanMetroStation"
+)
+
+var (
+	tflStopTypes = []string{"NaptanPublicBusCoachTram", "NaptanMetroStation",
+		"NaptanMetroPlatform", "NaptanOnstreetBusCoachStopCluster",
+		"NaptanOnstreetBusCoachStopPair", "TransportInterchange"}
 )
 
 type TFLClient struct {
@@ -28,8 +34,10 @@ type TFLClient struct {
 	Arrivals ArrivalsService
 }
 
-// NewClient returns a new DigitalOcean API client.
+// NewClient returns a new TFL API client.
 func NewTFLClient(httpClient *http.Client, appId string, appKey string) *TFLClient {
+	sort.Strings(tflStopTypes)
+
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
