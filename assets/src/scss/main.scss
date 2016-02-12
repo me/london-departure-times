@@ -31,3 +31,11 @@ body {
   width: 500px;
   height: 500px;
 }
+
+.results li {
+  margin-bottom: 5px;
+
+  .lines {
+    font-size: small;
+  }
+}

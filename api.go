@@ -26,6 +26,7 @@ type Vehicle struct {
 }
 
 type Arrival struct {
+	Line     string    `json:"line"`
 	Vehicle  Vehicle   `json:"vehicle"`
 	Expected time.Time `json:"expected"`
 }

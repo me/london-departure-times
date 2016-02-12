@@ -11,7 +11,7 @@ func TestTFLStops_Get(t *testing.T) {
 	setupTFL()
 	defer teardownTFL()
 
-	mux.HandleFunc("/StopPoints", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/StopPoint", func(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Fprint(w, `{
       "$type": "Tfl.Api.Presentation.Entities.StopPointsResponse, Tfl.Api.Presentation.Entities",
@@ -22,7 +22,7 @@ func TestTFLStops_Get(t *testing.T) {
         "id": "490015372W", "commonName": "Marcilly Road",
         "naptanId": "490015372W", "indicator": "Stop SB", "stopLetter": "SB", "modes": ["bus"],
         "icsCode": "1009638", "stopType": "NaptanPublicBusCoachTram", "stationNaptan": "490015372W",
-        "lat": 51.459726, "lon": -0.179222
+        "lat": 51.459726, "lon": -0.179222,
         "lines": [
           {
             "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",

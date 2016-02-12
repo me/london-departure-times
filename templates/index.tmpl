@@ -1,38 +1,29 @@
-<html>
-  <head>
-    <link rel="stylesheet" type="text/css" href="/assets/app.css">
-
-  </head>
-  <body id="stops-page">
-    <div class="wrapper">
-       <div class="results-section">
-        <div class="notice"></div>
-        <div class="sample-locations">
-          <ul>
-            <li><a href="javascript:void(0)" data-latlon="51.508154,-0.127507">Charing Cross</a></li>
-            <li><a href="javascript:void(0)" data-latlon="51.510321,-0.134672">Piccadilly Circus</a></li>
-            <li><a href="javascript:void(0)" data-latlon="51.503332,-0.112294">Waterloo Station</a></li>
-          </ul>
-        </div>
-        <ul class="results"></ul>
+{{ template "_top.tmpl" }}
+  <div id="page" class="stops-page wrapper">
+     <div class="results-section">
+      <div class="notice"></div>
+      <div class="sample-locations">
+        <ul>
+          <li><a href="javascript:void(0)" data-latlon="51.508154,-0.127507">Charing Cross</a></li>
+          <li><a href="javascript:void(0)" data-latlon="51.510321,-0.134672">Piccadilly Circus</a></li>
+          <li><a href="javascript:void(0)" data-latlon="51.503332,-0.112294">Waterloo Station</a></li>
+        </ul>
       </div>
-      <div class="map-section">
-        <form id="latlon-form" action="/api/stops" method="GET">
-          <div class="input-group">
-            <label for="lat">Latitude:</label>
-            <input type="text" id="lat" name="lat" placeholder="0.00" value="{{ .lat }}">
-            <label for="lat">Longitude</label>
-            <input type="text" id="lon" name="lon" placeholder="0.00" value="{{ .lon }}">
-          </div>
-        </form>
-        <form id="address-form" action="">
-          <input type="text" name="address" id="address" placeholder="Search for an address...">
-        </form>
-        <div id="map-container"></div>
-      </div>
-
+      <ul class="results"></ul>
     </div>
-    <script src="https://maps.googleapis.com/maps/api/js?v=3"></script>
-    <script type="text/javascript" src="/assets/app.js"></script>
-  </body>
-</html>
+    <div class="map-section">
+      <form id="latlon-form" action="/api/stops" method="GET">
+        <div class="input-group">
+          <label for="lat">Latitude:</label>
+          <input type="text" id="lat" name="lat" placeholder="0.00" value="{{ .lat }}">
+          <label for="lat">Longitude</label>
+          <input type="text" id="lon" name="lon" placeholder="0.00" value="{{ .lon }}">
+        </div>
+      </form>
+      <form id="address-form" action="">
+        <input type="text" name="address" id="address" placeholder="Search for an address...">
+      </form>
+      <div id="map-container"></div>
+    </div>
+  </div>
+{{ template "_bottom.tmpl" }}

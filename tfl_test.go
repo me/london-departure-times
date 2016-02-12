@@ -20,7 +20,7 @@ func setupTFL() {
 	mux = http.NewServeMux()
 	server = httptest.NewServer(mux)
 
-	client = NewTFLClient(nil)
+	client = NewTFLClient(nil, "", "")
 	url, _ := url.Parse(server.URL)
 	client.BaseURL = url
 }
@@ -30,7 +30,7 @@ func teardownTFL() {
 }
 
 func TestNewClient(t *testing.T) {
-	c := NewTFLClient(nil)
+	c := NewTFLClient(nil, "", "")
 	if c.BaseURL.String() != tflDefaultBaseURL {
 		t.Errorf("NewClient BaseURL = %v, expected %v", c.BaseURL.String(), tflDefaultBaseURL)
 	}

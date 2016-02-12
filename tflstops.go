@@ -47,14 +47,17 @@ func (api *TFLStopsServiceOp) Get(lat float64, lon float64, radius uint) ([]Stop
 		return nil, err
 	}
 
-	stops := make([]Stop, len(stopPointsResponse.StopPoints))
-	for i, tflStopPoint := range stopPointsResponse.StopPoints {
+	stops := make([]Stop, 0)
+	for _, tflStopPoint := range stopPointsResponse.StopPoints {
+		if len(tflStopPoint.Lines) == 0 {
+			continue
+		}
 		lines := make([]Line, len(tflStopPoint.Lines))
 		for j, tflLine := range tflStopPoint.Lines {
 			lines[j] = Line{tflLine.Id, tflLine.Name}
 		}
-		stops[i] = Stop{tflStopPoint.Id, "tfl", tflStopPoint.Indicator, tflStopPoint.Name,
-			tflStopPoint.Lat, tflStopPoint.Lon, lines}
+		stops = append(stops, Stop{tflStopPoint.Id, "tfl", tflStopPoint.Indicator, tflStopPoint.Name,
+			tflStopPoint.Lat, tflStopPoint.Lon, lines})
 	}
 	return stops, nil
 }

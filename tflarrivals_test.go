@@ -43,8 +43,8 @@ func TestTFLArrivals_Get(t *testing.T) {
         "vehicleId": "LJ09OLE",
         "naptanId": "490015372W",
         "stationName": "Marcilly Road",
-        "lineId": "156",
-        "lineName": "156",
+        "lineId": "157",
+        "lineName": "157",
         "platformName": "SB",
         "direction": "inbound",
         "destinationNaptanId": "",
@@ -68,7 +68,7 @@ func TestTFLArrivals_Get(t *testing.T) {
 	t1, _ := time.Parse(time.RFC3339, "2016-02-11T12:19:22Z")
 	v2 := Vehicle{Id: "LJ09OLE", Type: "bus", Destination: "Richmond"}
 	t2, _ := time.Parse(time.RFC3339, "2016-02-11T11:57:41Z")
-	expected := []Arrival{{Vehicle: v1, Expected: t1}, {Vehicle: v2, Expected: t2}}
+	expected := []Arrival{{Vehicle: v1, Line: "156", Expected: t1}, {Vehicle: v2, Line: "157", Expected: t2}}
 	if !reflect.DeepEqual(arrivals, expected) {
 		t.Errorf("Arrivals().Get returned %+v, expected %+v", arrivals, expected)
 	}

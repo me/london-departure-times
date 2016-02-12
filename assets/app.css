@@ -197,3 +197,8 @@ body {
 #map-container {
   width: 500px;
   height: 500px; }
+
+.results li {
+  margin-bottom: 5px; }
+  .results li .lines {
+    font-size: small; }
