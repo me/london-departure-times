@@ -38,7 +38,10 @@ func TestTFLStops_Get(t *testing.T) {
             "uri": "/Line/170",
             "type": "Line"
           }
-        ]
+        ],
+        "lineGroup": [{
+          "naptanIdReference": "490015372W"
+        }]
         }
       ]
     }`)

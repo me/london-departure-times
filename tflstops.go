@@ -66,14 +66,15 @@ func (api *TFLStopsServiceOp) Get(lat float64, lon float64, radius uint) ([]Stop
 
 func (api *TFLStopsServiceOp) ParseStop(stop *TFLStopPoint) []Stop {
 	stops := make([]Stop, 0)
-	if len(stop.Lines) > 0 && len(stop.LineGroup) == 1 && stop.LineGroup[0].Id == stop.Id {
+	oneLine := len(stop.LineGroup) == 1 && stop.LineGroup[0].Id == stop.Id
+	tube := stop.StopType == "NaptanMetroStation"
+	if len(stop.Lines) > 0 && (oneLine || tube) {
 		lines := make([]Line, len(stop.Lines))
 		for j, tflLine := range stop.Lines {
 			lines[j] = Line{tflLine.Id, tflLine.Name}
 		}
-		indicator := stop.Indicator
 
-		stops = append(stops, Stop{stop.Id, "tfl", indicator, stop.Name,
+		stops = append(stops, Stop{stop.Id, "tfl", stop.Indicator, stop.Name,
 			stop.Lat, stop.Lon, lines})
 	}
 	return stops

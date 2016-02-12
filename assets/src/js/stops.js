@@ -19,7 +19,7 @@ if ($("#page").is('.stops-page')) {
     .filter(it => it.lat !== "" && it.lon !== "")
     .map(it => ({lat: parseFloat(it.lat).toFixed(4), lon: parseFloat(it.lon).toFixed(4)}))
     .skipDuplicates((v1, v2) => (v1.lat == v2.lat && v1.lon == v2.lon))
-    .throttle(1000);
+    .debounce(500);
 
   let stopsRequest = positionStream.map( it =>
     ({ url: '/api/stops',
