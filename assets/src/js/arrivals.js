@@ -22,7 +22,7 @@ if ($("#page").is(".arrivals-page")) {
         if (arrivals.length === 0) {
             $(".notice").text("No arrivals found.");
         }
-      }, 2000);
+      }, 6000);
       arrivals = [];
       return;
     } else {
