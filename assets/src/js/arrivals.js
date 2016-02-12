@@ -7,7 +7,7 @@ import moment from 'moment';
 if ($("#page").is(".arrivals-page")) {
   let stopId = window.location.pathname.split('/').pop();
   let $results = $(".results");
-  let poller = Bacon.mergeAll(Bacon.once(true), Bacon.interval(1000, true))
+  let poller = Bacon.mergeAll(Bacon.once(true), Bacon.interval(3000, true))
     .map( v => ({url: `/api/tfl/arrivals/${stopId}`}))
     .ajax();
   let arrivals = null;
@@ -45,7 +45,7 @@ if ($("#page").is(".arrivals-page")) {
         description += ` to ${arrival.vehicle.destination}`;
       }
       $results.append(
-        $("<li/>").append(
+        $("<li/>").addClass(`vehicle ${arrival.vehicle.type}`).append(
           $("<span />").text(`${description} ${expected}`)
         )
       );

@@ -1,41 +1,57 @@
 @import "bourbon/bourbon";
 @import "base/base";
 
-body {
-  background: white;
-}
 
-#latlon-form {
-  display: none;
-}
+.stops-page {
+  #latlon-form {
+    display: none;
+  }
 
-.sample-locations {
-  display: none;
-}
+  .sample-locations {
+    display: none;
+  }
 
-.wrapper {
-  @include clearfix;
-  margin: 0 20px;
-}
+  .wrapper {
+    @include clearfix;
+    margin: 0 20px;
+  }
 
-.results-section {
-  float: left;
-}
+  .results-section {
+    float: left;
+  }
 
-.map-section {
-  width: 500px;
-  float: right;
-}
+  .map-section {
+    width: 500px;
+    float: right;
+  }
 
-#map-container {
-  width: 500px;
-  height: 500px;
-}
+  #map-container {
+    width: 500px;
+    height: 500px;
+  }
 
-.results li {
-  margin-bottom: 5px;
+  .results li {
+    margin-bottom: 5px;
 
-  .lines {
-    font-size: small;
+    .lines {
+      font-size: small;
+    }
   }
 }
+
+.arrivals-page {
+  li.vehicle {
+    padding-left: 50px;
+    margin: 10px 10px;
+
+
+    &.bus {
+      background: #ffffff url("img/bus.png") no-repeat left top;
+    }
+
+    &.tube {
+      background: #ffffff url("img/tube.png") no-repeat left top;
+    }
+  }
+}
+

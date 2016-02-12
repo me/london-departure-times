@@ -9,6 +9,7 @@
     "bacon.model": "^0.1.12",
     "baconjs": "^0.7.83",
     "css-loader": "~0.23.1",
+    "image-webpack-loader": "^1.6.3",
     "jquery": "^2.2.0",
     "moment": "^2.11.2",
     "node-sass": "~3.4.2",
