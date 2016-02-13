@@ -11,7 +11,7 @@ import (
 
 func main() {
 	// Main performers
-	poller := NewPoller()
+	poller := NewPoller(nil)
 	client := NewTFLClient(nil, os.Getenv("TFL_APP_ID"), os.Getenv("TFL_APP_KEY"))
 
 	// Serve pages
@@ -28,7 +28,7 @@ func main() {
 	})
 
 	r.GET("/tfl/arrivals/:stopId", func(c *gin.Context) {
-		_ = poller.Request(client, c.Param("stopId"))
+		_ = poller.Request(client.Arrivals, c.Param("stopId"))
 
 		c.HTML(http.StatusOK, "arrivals.tmpl", gin.H{"provider": "tfl", "stopId": c.Param("stopId")})
 	})
@@ -59,7 +59,7 @@ func main() {
 	})
 
 	api.GET("/tfl/arrivals/:stopId", func(c *gin.Context) {
-		arrivals := poller.Request(client, c.Param("stopId"))
+		arrivals := poller.Request(client.Arrivals, c.Param("stopId"))
 		c.JSON(http.StatusOK, gin.H{"arrivals": arrivals})
 	})
 

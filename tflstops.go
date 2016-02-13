@@ -49,7 +49,6 @@ func (api *TFLStopsServiceOp) Get(lat float64, lon float64, radius uint) ([]Stop
 	query.Set("stopTypes", strings.Join(tflStopTypes, ","))
 	query.Set("useStopPointHierarchy", "false")
 	u.RawQuery = query.Encode()
-	fmt.Println(u.String())
 
 	stopPointsResponse := new(TFLStopPointsResponse)
 	_, err := api.client.Request(*u, stopPointsResponse)
