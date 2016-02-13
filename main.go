@@ -10,10 +10,11 @@ import (
 )
 
 func main() {
-	log.Println("hey there1")
+	// Main performers
 	poller := NewPoller()
-	log.Println("hey there")
 	client := NewTFLClient(nil, os.Getenv("TFL_APP_ID"), os.Getenv("TFL_APP_KEY"))
+
+	// Serve pages
 
 	r := gin.Default()
 
@@ -27,11 +28,12 @@ func main() {
 	})
 
 	r.GET("/tfl/arrivals/:stopId", func(c *gin.Context) {
-
 		_ = poller.Request(client, c.Param("stopId"))
 
 		c.HTML(http.StatusOK, "arrivals.tmpl", gin.H{"provider": "tfl", "stopId": c.Param("stopId")})
 	})
+
+	// API
 
 	api := r.Group("/api")
 
@@ -60,5 +62,6 @@ func main() {
 		arrivals := poller.Request(client, c.Param("stopId"))
 		c.JSON(http.StatusOK, gin.H{"arrivals": arrivals})
 	})
+
 	r.Run()
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"sync"
 	"time"
 )
 
@@ -13,7 +14,6 @@ const (
 
 // PollState represents the current state of a Stop being polled.
 type PollState struct {
-	StopId   string
 	Arrivals []Arrival
 	Expires  time.Time
 }
@@ -24,19 +24,51 @@ type PollResult struct {
 }
 
 type Poller struct {
-	requests   chan<- *PollResource
-	stopStates map[string]*PollState
+	requests    chan<- *PollResource
+	stopStates  map[string]*PollState
+	statesMutex *sync.RWMutex
 }
 
 func (p *Poller) Request(client *TFLClient, stopId string) []Arrival {
 	request := PollResource{client: client, stopId: stopId}
-	if p.stopStates[stopId] != nil {
-		p.stopStates[stopId].Expires = time.Now().Add(expireInterval)
-		return p.stopStates[stopId].Arrivals
+
+	var arrivals []Arrival
+	p.statesMutex.RLock()
+	state := p.stopStates[stopId]
+	if state == nil {
+		arrivals = nil
 	} else {
-		p.requests <- &request
-		return nil
+		arrivals = state.Arrivals
 	}
+	p.statesMutex.RUnlock()
+
+	if state == nil {
+		p.CreateState(stopId)
+		p.requests <- &request
+	} else {
+		p.ExtendExpires(stopId)
+	}
+	return arrivals
+}
+
+func (p *Poller) CreateState(stopId string) {
+	expiration := time.Now().Add(expireInterval)
+	p.statesMutex.Lock()
+	p.stopStates[stopId] = &PollState{make([]Arrival, 0), expiration}
+	p.statesMutex.Unlock()
+}
+
+func (p *Poller) SetArrivals(stopId string, arrivals []Arrival) {
+	p.statesMutex.Lock()
+	p.stopStates[stopId].Arrivals = arrivals
+	p.statesMutex.Unlock()
+}
+
+func (p *Poller) ExtendExpires(stopId string) {
+	expiration := time.Now().Add(expireInterval)
+	p.statesMutex.Lock()
+	p.stopStates[stopId].Expires = expiration
+	p.statesMutex.Unlock()
 }
 
 // PollResource represents a stopId to be polled.
@@ -78,16 +110,13 @@ func NewPoller() *Poller {
 
 	pollResults := make(chan PollResult)
 	stopStates := make(map[string]*PollState)
+	poller := Poller{requests: pending, stopStates: stopStates, statesMutex: &sync.RWMutex{}}
+
 	go func() {
 		for {
 			select {
 			case r := <-pollResults:
-				if stopStates[r.StopId] != nil {
-					stopStates[r.StopId] = &PollState{r.StopId, r.Arrivals, stopStates[r.StopId].Expires}
-				} else {
-					stopStates[r.StopId] = &PollState{r.StopId, r.Arrivals, time.Now().Add(expireInterval)}
-				}
-
+				poller.SetArrivals(r.StopId, r.Arrivals)
 			}
 		}
 	}()
@@ -102,8 +131,6 @@ func NewPoller() *Poller {
 			go r.Sleep(pending, stopStates[r.stopId])
 		}
 	}()
-
-	poller := Poller{requests: pending, stopStates: stopStates}
 
 	return &poller
 }
