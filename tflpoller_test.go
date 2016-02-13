@@ -17,19 +17,23 @@ func TestTFLPoller(t *testing.T) {
 	stopId := "123"
 	result1 := poller.Request(fakeService, stopId)
 	if result1 != nil {
-		t.Errorf("Expected first result to be nil")
+		t.Error("Expected first result to be nil")
 	}
 	time.Sleep(15 * time.Millisecond)
 	result2 := poller.Request(fakeService, stopId)
 	if len(result2) != 1 {
-		t.Errorf("Expected second result to be of length 1")
+		t.Error("Expected second result to be of length 1")
 	}
 	if result2[0].Line != "testline" {
-		t.Errorf("Expected second result to contain the fake result")
+		t.Error("Expected second result to contain the fake result")
 	}
 	time.Sleep(100 * time.Millisecond)
 	cnt := fakeService.GetCallCount()
 	if cnt != 4 {
 		t.Errorf("Expected service to be called exactly 4 times, was called %v", cnt)
+	}
+	result3 := poller.Request(fakeService, stopId)
+	if result3 != nil {
+		t.Error("Expected result after expiration to be nil")
 	}
 }

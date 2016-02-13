@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"log"
 	"sync"
 	"time"
@@ -40,23 +41,26 @@ type Poller struct {
 func (p *Poller) Request(service ArrivalsService, stopId string) []Arrival {
 	request := PollResource{service: service, stopId: stopId}
 
-	var arrivals []Arrival
-	p.statesMutex.RLock()
-	state := p.stopStates[stopId]
-	if state == nil {
-		arrivals = nil
-	} else {
-		arrivals = state.Arrivals
-	}
-	p.statesMutex.RUnlock()
+	state, err := p.GetState(stopId)
 
-	if state == nil {
+	if err != nil {
 		p.CreateState(stopId)
 		p.requests <- &request
 	} else {
 		p.ExtendExpires(stopId)
 	}
-	return arrivals
+	return state.Arrivals
+}
+
+// Returns the current state for a stopId, or an error if it's not found
+func (p *Poller) GetState(stopId string) (PollState, error) {
+	p.statesMutex.RLock()
+	defer p.statesMutex.RUnlock()
+	state := p.stopStates[stopId]
+	if state == nil {
+		return PollState{}, errors.New("No state")
+	}
+	return *state, nil
 }
 
 // Creates a new empty PollState in the state map.
@@ -64,6 +68,13 @@ func (p *Poller) CreateState(stopId string) {
 	expiration := time.Now().Add(p.options.expireInterval)
 	p.statesMutex.Lock()
 	p.stopStates[stopId] = &PollState{make([]Arrival, 0), expiration}
+	p.statesMutex.Unlock()
+}
+
+// Removes a stopId from the state map
+func (p *Poller) DeleteState(stopId string) {
+	p.statesMutex.Lock()
+	delete(p.stopStates, stopId)
 	p.statesMutex.Unlock()
 }
 
@@ -98,11 +109,18 @@ func (r *PollResource) Poll() []Arrival {
 	return resp
 }
 
-// Sleeps for an appropriate interval before sending the PollResource to requeue.
-func (r *PollResource) Sleep(requeue chan<- *PollResource, status *PollState, pollInterval time.Duration) {
+// Sleeps for the set interval; after this, if the status is expired,
+// removes it from the poller status map; otherwise, requeues it for execution.
+func (r *PollResource) Sleep(poller *Poller, pollInterval time.Duration) {
 	time.Sleep(pollInterval)
+	status, err := poller.GetState(r.stopId)
+	if err != nil {
+		return
+	}
 	if status.Expires.After(time.Now()) {
-		requeue <- r
+		poller.requests <- r
+	} else {
+		poller.DeleteState(r.stopId)
 	}
 }
 
@@ -157,7 +175,7 @@ func NewPoller(options *PollerOptions) *Poller {
 	// Sleep tasks when they are complete
 	go func() {
 		for r := range complete {
-			go r.Sleep(pending, stopStates[r.stopId], options.pollInterval)
+			go r.Sleep(&poller, options.pollInterval)
 		}
 	}()
 
