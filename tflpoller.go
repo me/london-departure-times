@@ -91,7 +91,7 @@ func (r *PollResource) Poll() []Arrival {
 // before sending the PollResource to requeue.
 func (r *PollResource) Sleep(requeue chan<- *PollResource, status *PollState) {
 	time.Sleep(pollInterval)
-	if status == nil || status.Expires.After(time.Now()) {
+	if status.Expires.After(time.Now()) {
 		requeue <- r
 	}
 }
