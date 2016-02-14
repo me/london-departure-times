@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"sort"
+	"time"
 )
 
 const (
@@ -19,6 +20,58 @@ var (
 		"NaptanMetroPlatform", "NaptanOnstreetBusCoachStopCluster",
 		"NaptanOnstreetBusCoachStopPair", "TransportInterchange"}
 )
+
+/**********************
+* API entity structs
+**********************/
+
+// Arrivals API call implementation
+type TFLArrivalsServiceOp struct {
+	client *TFLClient
+}
+
+// TFL Arrival
+type TFLArrival struct {
+	Id              string    `json:"naptanId"`
+	LineName        string    `json:"lineName"`
+	VehicleId       string    `json:"vehicleId"`
+	DestinationName string    `json:"destinationName"`
+	ExpectedArrival time.Time `json:"expectedArrival"`
+	ModeName        string    `json:"modeName"`
+}
+
+// Stops API call implementation
+type TFLStopsServiceOp struct {
+	client *TFLClient
+}
+
+// GET /StopPoint response
+type TFLStopPointsResponse struct {
+	StopPoints []TFLStopPoint `json:"stopPoints"`
+}
+
+// GET /StopPoint embedded StopPoint
+type TFLStopPoint struct {
+	Id        string          `json:"id"`
+	Indicator string          `json:"indicator"`
+	Name      string          `json:"commonName"`
+	Lat       float64         `json:"lat"`
+	Lon       float64         `json:"lon"`
+	StopType  string          `json:"stopType"`
+	Lines     []TFLIdentifier `json:"lines"`
+	Children  []TFLStopPoint  `json:"children"`
+	LineGroup []TFLLineGroup  `json:"lineGroup"`
+}
+
+// TFL line identifier
+type TFLIdentifier struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+}
+
+type TFLLineGroup struct {
+	Id string `json:"naptanIdReference"`
+}
 
 type TFLClient struct {
 	// HTTP client used to communicate with the API.
@@ -34,7 +87,11 @@ type TFLClient struct {
 	Arrivals ArrivalsService
 }
 
-// NewClient returns a new TFL API client.
+/**********************
+* Public interface
+**********************/
+
+// Returns a new TFL API client, given the http client, appId and appKey
 func NewTFLClient(httpClient *http.Client, appId string, appKey string) *TFLClient {
 	sort.Strings(tflStopTypes)
 
@@ -52,6 +109,11 @@ func NewTFLClient(httpClient *http.Client, appId string, appKey string) *TFLClie
 	return c
 }
 
+/**********************
+* Helper methods
+**********************/
+
+// Performs a request on the TFL API
 func (client *TFLClient) Request(url url.URL, v interface{}) (*http.Response, error) {
 	query := url.Query()
 	query.Set("app_id", client.appId)

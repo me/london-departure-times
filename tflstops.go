@@ -5,39 +5,6 @@ import (
 	"strings"
 )
 
-// Stops API call implementation
-type TFLStopsServiceOp struct {
-	client *TFLClient
-}
-
-// GET /StopPoint response
-type TFLStopPointsResponse struct {
-	StopPoints []TFLStopPoint `json:"stopPoints"`
-}
-
-// GET /StopPoint embedded StopPoint
-type TFLStopPoint struct {
-	Id        string          `json:"id"`
-	Indicator string          `json:"indicator"`
-	Name      string          `json:"commonName"`
-	Lat       float64         `json:"lat"`
-	Lon       float64         `json:"lon"`
-	StopType  string          `json:"stopType"`
-	Lines     []TFLIdentifier `json:"lines"`
-	Children  []TFLStopPoint  `json:"children"`
-	LineGroup []TFLLineGroup  `json:"lineGroup"`
-}
-
-// TFL line identifier
-type TFLIdentifier struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
-}
-
-type TFLLineGroup struct {
-	Id string `json:"naptanIdReference"`
-}
-
 // GET /StopPoint
 func (api *TFLStopsServiceOp) Get(lat float64, lon float64, radius uint) ([]Stop, error) {
 	u := api.client.BaseURL

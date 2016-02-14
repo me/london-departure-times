@@ -3,23 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
-	"time"
 )
-
-// Arrivals API call implementation
-type TFLArrivalsServiceOp struct {
-	client *TFLClient
-}
-
-// TFL Arrival
-type TFLArrival struct {
-	Id              string    `json:"naptanId"`
-	LineName        string    `json:"lineName"`
-	VehicleId       string    `json:"vehicleId"`
-	DestinationName string    `json:"destinationName"`
-	ExpectedArrival time.Time `json:"expectedArrival"`
-	ModeName        string    `json:"modeName"`
-}
 
 // GET /StopPoint/[stopId]/Arrivals
 func (api *TFLArrivalsServiceOp) Get(stopId string) ([]Arrival, error) {
