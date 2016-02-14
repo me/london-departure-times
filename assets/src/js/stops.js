@@ -11,7 +11,7 @@ if ($("#page").is('.stops-page')) {
   });
   let map = new google.maps.Map(document.getElementById('map-container'), {
     zoom: 16, minZoom: 15,
-    disableDoubleClickZoom: false
+    disableDoubleClickZoom: false, scrollwheel: false
   });
   let geocoder = new google.maps.Geocoder();
 

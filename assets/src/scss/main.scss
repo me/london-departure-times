@@ -3,9 +3,21 @@
 
 $breakpoints: (tablet: 810px, desktop: 1024px);
 
+body {
+  background: #F3F3F3;
+  padding: 0 30px;
+  @include media("<desktop") {
+    padding: 0;
+  }
+}
 .wrapper {
+  background: #F9F9F9;
   @include clearfix;
-  margin: 20px 40px;
+  margin: 10px auto;
+  padding: 15px;
+  max-width: 1280px;
+  border-radius: 10px;
+  border: 1px solid #F0F0F0;
 }
 
 .stops-page {
@@ -28,11 +40,11 @@ $breakpoints: (tablet: 810px, desktop: 1024px);
 
     form, #map-container {
       margin: 0 auto;
-      width: 500px;
+      width: 480px;
     }
 
     #map-container {
-      height: 500px;
+      height: 480px;
     }
 
     @include media("<desktop") {
@@ -84,11 +96,11 @@ $breakpoints: (tablet: 810px, desktop: 1024px);
 
 
     &.bus {
-      background: #ffffff url("img/bus.png") no-repeat left top;
+      background: url("img/bus.png") no-repeat left top;
     }
 
     &.tube {
-      background: #ffffff url("img/tube.png") no-repeat left top;
+      background: url("img/tube.png") no-repeat left top;
     }
   }
 }
