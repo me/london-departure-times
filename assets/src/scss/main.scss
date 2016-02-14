@@ -1,6 +1,12 @@
 @import "bourbon/bourbon";
 @import "base/base";
 
+$breakpoints: (tablet: 810px, desktop: 1024px);
+
+.wrapper {
+  @include clearfix;
+  margin: 20px 40px;
+}
 
 .stops-page {
   #latlon-form {
@@ -11,23 +17,52 @@
     display: none;
   }
 
-  .wrapper {
-    @include clearfix;
-    margin: 0 20px;
-  }
-
   .results-section {
     float: left;
+    width: 50%;
   }
 
   .map-section {
-    width: 500px;
-    float: right;
+    width: 50%;
+    float: left;
+
+    form, #map-container {
+      margin: 0 auto;
+      width: 500px;
+    }
+
+    #map-container {
+      height: 500px;
+    }
+
+    @include media("<desktop") {
+      form, #map-container {
+        width: 400px;
+      }
+      #map-container {
+        height: 400px;
+      }
+    }
   }
 
-  #map-container {
-    width: 500px;
-    height: 500px;
+  @include media("<tablet") {
+    .results-section, .map-section {
+      float: none;
+    }
+
+    .results-section {
+      width: 100%;
+      text-align: center;
+    }
+
+    .map-section {
+      width: 100%;
+      margin-top: 20px;
+    }
+  }
+
+  .results {
+    margin: 0 auto;
   }
 
   .results li {
@@ -40,6 +75,9 @@
 }
 
 .arrivals-page {
+  h2 {
+    font-size: 1.2em;
+  }
   li.vehicle {
     padding-left: 50px;
     margin: 10px 10px;

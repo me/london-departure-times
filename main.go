@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/joho/godotenv/autoload"
 	"log"
@@ -34,9 +35,25 @@ func ServeRequests(poller *Poller, client *TFLClient) {
 	})
 
 	r.GET("/tfl/arrivals/:stopId", func(c *gin.Context) {
-		_ = poller.Request(client.Arrivals, c.Param("stopId"))
+		stopId := c.Param("stopId")
 
-		c.HTML(http.StatusOK, "arrivals.tmpl", gin.H{"provider": "tfl", "stopId": c.Param("stopId")})
+		// The poller is called right away: it will error if the stop is not found,
+		// but this gives more time to fetch the request before the page is loaded.
+		_ = poller.Request(client.Arrivals, stopId)
+
+		stop, err := client.StopPoint.Get(stopId)
+
+		if err != nil || stop == nil {
+			c.HTML(http.StatusNotFound, "notfound.tmpl", gin.H{})
+			return
+		}
+		stopName := stop.Name
+		if stop.Indicator != "" {
+			stopName += fmt.Sprintf(" - %s", stop.Indicator)
+		}
+
+		c.HTML(http.StatusOK, "arrivals.tmpl", gin.H{"provider": "tfl", "stopId": c.Param("stopId"),
+			"stopName": stopName})
 	})
 
 	// API

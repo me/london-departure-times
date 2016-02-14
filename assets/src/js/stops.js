@@ -66,7 +66,7 @@ if ($("#page").is('.stops-page')) {
   });
 
   positionStream.onValue(it => {
-    $(".notice").text("Please wait, loading results...");
+    $(".notice").text("Please wait, loading stops...");
     $('.sample-locations').hide();
     $('.results').empty();
     history.replaceState({}, "", `?lat=${it.lat}&lon=${it.lon}`);
@@ -94,7 +94,12 @@ if ($("#page").is('.stops-page')) {
     $('.results').empty();
     if (v.stops.length === 0) {
       showNoResults();
+      return;
     }
+    let $ul = $('<ul/>');
+    $('.results').append(
+      $('<h3/>').text("Stops near your location")
+    ).append($ul);
     for (let stop of v.stops) {
       let stopName = stop.name;
       if (stop.indicator !== ""){ stopName += ` - ${stop.indicator}`; }
@@ -107,7 +112,7 @@ if ($("#page").is('.stops-page')) {
       marker.addListener('click', e => {document.location.href = stopTarget;});
       markers.push(marker);
       let lines = stop.lines.map(v => v.name).join(", ");
-      $('.results').append(
+      $ul.append(
         $('<li/>').append(
           $("<a/>").text(stopName)
             .attr("href", stopTarget)
