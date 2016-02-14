@@ -25,12 +25,6 @@ var (
 * API entity structs
 **********************/
 
-// Arrivals API call implementation
-type TFLArrivalsServiceOp struct {
-	client *TFLClient
-}
-
-// TFL Arrival
 type TFLArrival struct {
 	Id              string    `json:"naptanId"`
 	LineName        string    `json:"lineName"`
@@ -40,17 +34,6 @@ type TFLArrival struct {
 	ModeName        string    `json:"modeName"`
 }
 
-// Stops API call implementation
-type TFLStopsServiceOp struct {
-	client *TFLClient
-}
-
-// GET /StopPoint response
-type TFLStopPointsResponse struct {
-	StopPoints []TFLStopPoint `json:"stopPoints"`
-}
-
-// GET /StopPoint embedded StopPoint
 type TFLStopPoint struct {
 	Id        string          `json:"id"`
 	Indicator string          `json:"indicator"`
@@ -63,7 +46,6 @@ type TFLStopPoint struct {
 	LineGroup []TFLLineGroup  `json:"lineGroup"`
 }
 
-// TFL line identifier
 type TFLIdentifier struct {
 	Id   string `json:"id"`
 	Name string `json:"name"`
@@ -73,6 +55,12 @@ type TFLLineGroup struct {
 	Id string `json:"naptanIdReference"`
 }
 
+/**********************
+* Public interface
+**********************/
+
+// The TFL API client, containing pointers to the http client and
+// the API endpoint services.
 type TFLClient struct {
 	// HTTP client used to communicate with the API.
 	client *http.Client
@@ -83,13 +71,10 @@ type TFLClient struct {
 	appId  string
 	appKey string
 
-	Stops    StopsService
-	Arrivals ArrivalsService
+	Stops     StopsService
+	Arrivals  ArrivalsService
+	StopPoint StopPointService
 }
-
-/**********************
-* Public interface
-**********************/
 
 // Returns a new TFL API client, given the http client, appId and appKey
 func NewTFLClient(httpClient *http.Client, appId string, appKey string) *TFLClient {
@@ -105,6 +90,7 @@ func NewTFLClient(httpClient *http.Client, appId string, appKey string) *TFLClie
 
 	c.Stops = &TFLStopsServiceOp{client: c}
 	c.Arrivals = &TFLArrivalsServiceOp{client: c}
+	c.StopPoint = &TFLStopPointServiceOp{client: c}
 
 	return c
 }

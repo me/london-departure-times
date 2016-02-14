@@ -38,3 +38,7 @@ type StopsService interface {
 type ArrivalsService interface {
 	Get(stopId string) ([]Arrival, error)
 }
+
+type StopPointService interface {
+	Get(stopId string) (*Stop, error)
+}

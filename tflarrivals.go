@@ -5,6 +5,11 @@ import (
 	"log"
 )
 
+// Arrivals API call implementation
+type TFLArrivalsServiceOp struct {
+	client *TFLClient
+}
+
 // GET /StopPoint/[stopId]/Arrivals
 func (api *TFLArrivalsServiceOp) Get(stopId string) ([]Arrival, error) {
 	u := api.client.BaseURL

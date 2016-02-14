@@ -5,6 +5,16 @@ import (
 	"strings"
 )
 
+// GET /StopPoint response
+type TFLStopPointsResponse struct {
+	StopPoints []TFLStopPoint `json:"stopPoints"`
+}
+
+// Stops API call implementation
+type TFLStopsServiceOp struct {
+	client *TFLClient
+}
+
 // GET /StopPoint
 func (api *TFLStopsServiceOp) Get(lat float64, lon float64, radius uint) ([]Stop, error) {
 	u := api.client.BaseURL
