@@ -15,10 +15,16 @@ func main() {
 	client := NewTFLClient(nil, os.Getenv("TFL_APP_ID"), os.Getenv("TFL_APP_KEY"))
 
 	// Serve pages
+	ServeRequests(poller, client)
+}
 
+func ServeRequests(poller *Poller, client *TFLClient) {
 	r := gin.Default()
 
 	r.Static("/assets", "./assets")
+
+	// HTML pages
+
 	r.LoadHTMLGlob("templates/*")
 
 	r.GET("/", func(c *gin.Context) {
