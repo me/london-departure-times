@@ -30,13 +30,19 @@ if ($("#page").is('.stops-page')) {
   if (position.get().lat === "" && position.get().lon === "") {
     $notice.text("Please wait, finding your location...");
     let geoLocalize = Bacon.fromCallback(navigator.geolocation, 'getCurrentPosition');
-    geoLocalize.onValue(it => {
+    let unsubscribeGeo = geoLocalize.onValue(it => {
       position.set({lat: it.coords.latitude, lon: it.coords.longitude});
     });
-    geoLocalize.onError( e => {
-      $notice.text("We are sorry, we were not able to localize you. You can search in the box on the left, or try some sample location below!");
-      $('.sample-locations').show();
-    });
+    let geoLocalizeError = () => {
+      unsubscribeGeo();
+      let pos = position.get();
+      if (pos.lat === "" || pos.lon === "") {
+        $notice.text("We are sorry, we were not able to localize you. You can search in the box on the right, or try some sample location below!");
+        $('.sample-locations').show();
+      }
+    };
+    geoLocalize.onError(geoLocalizeError);
+    setTimeout(geoLocalizeError, 10000);
   }
 
   $('body').on('click', 'a[data-latlon]', (e) => {
